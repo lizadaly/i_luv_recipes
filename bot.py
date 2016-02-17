@@ -111,4 +111,4 @@ if __name__ == '__main__':
 
     (recipe, message) = loop()
     logging.info("Posting message {}".format(message))
-    #tweet(recipe, message)
+    tweet(recipe, message)
