@@ -7,8 +7,10 @@ import requests
 import sys
 import tweepy
 import tempfile
-import urlparse
 import os.path
+import logging
+
+logging.basicConfig()
 
 foods = [food.strip() for food in open('foods.txt')]
 starts = [start.strip() for start in open('start.txt')]
@@ -41,7 +43,12 @@ def find_random_recipe(tries):
 def get_comments(recipe=None):
     url = recipe['source_url']
     title = recipe['title']
-    items = microdata.get_items(urllib.urlopen(url))
+    try:
+        items = microdata.get_items(urllib.request.urlopen(url))
+    except urllib.error.HTTPError:
+        return None
+    except AttributeError:
+        return None
     
     for item in items:
         if len(item.get_all('ingredients')) > 0:
@@ -67,7 +74,7 @@ def get_comments(recipe=None):
                     )
                     if len(mesg) > (140 - 23 - 23):
                         # This message is too long
-                        print "Message was too long; retrying"
+                        logging.warning("Message was too long; retrying")
                         return None
                     else:
                         return mesg + url
@@ -85,7 +92,6 @@ def tweet(recipe, message):
     auth.secure = True
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
-    print "Posting message {}".format(message)
     
     if recipe['image_url']:
         # Get the image
@@ -104,4 +110,5 @@ def tweet(recipe, message):
 if __name__ == '__main__':
 
     (recipe, message) = loop()
+    logging.info("Posting message {}".format(message))
     tweet(recipe, message)
