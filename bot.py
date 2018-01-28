@@ -12,6 +12,8 @@ import logging
 
 logging.basicConfig()
 
+MAX_TWEET_BASE_LENGTH = 280
+
 foods = [food.strip() for food in open('foods.txt')]
 starts = [start.strip() for start in open('start.txt')]
 comments = [comment.strip() for comment in open('comments.txt')]
@@ -72,7 +74,7 @@ def get_comments(recipe=None):
                                                               random.sample(foods, 1)[0],
                                                               random.sample(comments, 1)[0],
                     )
-                    if len(mesg) > (140 - 23 - 23):
+                    if len(mesg) > (MAX_TWEET_BASE_LENGTH - 23 - 23):
                         # This message is too long
                         logging.warning("Message was too long; retrying")
                         return None
